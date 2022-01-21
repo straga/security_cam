@@ -6,7 +6,7 @@
 
 ## Flash over flasher without solder.
 
-Backup original - hard method. I am use esptool and esp8266 with solder-out flash.
+Backup original - hard method. I am using esptool and esp8266 with solder-out flash.
 
 ```
 python ./esptool.py --port /dev/ttyUSB0  read_flash 0x00000 0x1000000 backup.img
@@ -29,7 +29,7 @@ python ./esptool.py --port /dev/ttyUSB0  read_flash 0x00000 0x1000000 backup.img
 
 ![43c308c827e87dd513387b86b219f558.png](/_resources/43c308c827e87dd513387b86b219f558.png)
 
-tftp server : 192.168.100.249 Backup original - soft method.
+TFTP server: 192.168.100.249 Backup original - soft method.
 
 ```
 setenv ipaddr 192.168.100.240
@@ -61,7 +61,7 @@ use original u-boot. Others: not works any Ethernet
 
 **MII** \[Media Independent Interface\] standard for MAC level and PHY chip.
 
-That board have:
+That board has:
 
 ```#
 # mii device 
@@ -70,7 +70,7 @@ MII devices: ‘0:0’ ‘0:1’ Current device: ‘0:0’`
 
 ## Login first and get information.
 
-Turn ON and press Enter go to U-boot console.
+Turn ON and press Enter to go to the U-boot console.
 
 Change **root** and **admin** password.
 
@@ -90,7 +90,7 @@ Starting kernel ...
 uid=0(root) gid=0(root)
 ```
 
-root:root and admin:admin.
+root: root and admin: admin.
 
 ```
 # echo "root:\$1\$tiaLlxGM\$dYNMJJQRKN2buGE0u/R88/:16199:0:99999:7:::" > /etc/shadow
@@ -99,7 +99,7 @@ root:root and admin:admin.
 # halt
 ```
 
-Restart and Login with new password.
+Restart and login with a new password.
 
 ## Get MAC
 
@@ -171,7 +171,6 @@ detect_err_frame drop_err_frame stop_int_level  max_cas_gap
 ```
 [reginfo.pdf](/_resources/reginfo.pdf)
 
-
 ** hisi_gpio_scanner**
 ```
 Original
@@ -207,7 +206,6 @@ Gr:10, Addr:0x201E03FC, Data:0x00 = 0b00000000, Addr:0x201E0400, Dir:0x00 = 0b00
 Gr:11, Addr:0x201F03FC, Data:0x00 = 0b00000000, Addr:0x201F0400, Dir:0x00 = 0b00000000
 --------------------------------------------------------------------------------------
 ```
-
 
 ## ipctool
 
@@ -265,10 +263,9 @@ sensors:
     type: DC
   clock: 24MHz
 
-
 ```
 
-## Flash over Tftp
+## Flash over TFTP
 
 ```
 Hi3518ev100 - you can try uboot.
@@ -277,7 +274,6 @@ Hi3518ev100 - you can try uboot.
 # tftp 0x82000000 boot.img
 # sf erase 0x00 0x80000
 # sf write 0x82000000 0x00 ${filesize}
-
 
 Layout from For Original U-boot
 0x000000000000-0x000000040000 : "boot" 256 0x40000   
@@ -335,8 +331,8 @@ setenv totalmem 64M
 
 ## Reboot and check OpenIPC
 
-- Change Sensor MASK : ComMsk0: **ffc00000**, ComMsk1: **0** /etc/sensors/ov9712\_i2c\_dc_720p.ini
-- Configure Majestic for PIN night/day CUT 
+- Change Sensor MASK : ComMsk0: **ffc00000**, ComMsk1: **0** /etc/sensors/ov9712\_i2c\_dc_720p.ini
+- Configure Majestic for PIN night/day CUT 
     - /etc/majestic.yaml
 
 ```
@@ -363,42 +359,43 @@ enable the SAR_ADC to enter the working state.
 
 ADC_POWERDOWN[adc_pwrdown]
 ```
-	# himm 0x200b0008 0x0
-	# devmem 0x200b0008 32 0x0
+  # himm 0x200b0008 0x0
+  # devmem 0x200b0008 32 0x0
 ```
 PERI_CRG32[sar_adc_cken]
 ```
-	# himm 0x20030080 0x2
-	# devmem 0x20030080 32 0x2
+  # himm 0x20030080 0x2
+  # devmem 0x20030080 32 0x2
 ```
 2. Set ADC_CTRL[adc_chsel] to 0 to select channel 0.
 
 ADC_CTRL[adc_chsel]
 ```
-	# himm 0x200B0004 0x00000000
-	# devmem 0x200B0004 32 0x00000000
+  # himm 0x200B0004 0x00000000
+  # devmem 0x200B0004 32 0x00000000
 ```
 3. Set ADC_INT_MASK[adc_int_mask] to 0 to enable the conversion completion interrupt.
 ```
-	# himm 0x200B0010 0x00000000
-	# devmem 0x200B0010 32 0x00000000
+  # himm 0x200B0010 0x00000000
+  # devmem 0x200B0010 32 0x00000000
 ```
 4. Set ADC_CTRL[adc_start] to 1 to enable an analog-to-digital conversion.
 ```
-	# himm 0x200B0004 0x00000001
-	# devmem 0x200B0004 32 0x00000001
+  # himm 0x200B0004 0x00000001
+  # devmem 0x200B0004 32 0x00000001
 ```
 5. wait interrupt
 
 6. Read ADC_RESULT[adc_result_reg] to query the conversion result.
 ADC_RESULT
 ```
-	# himm 0x200B001C
-	# devmem 0x200B001C
+  # himm 0x200B001C
+  # devmem 0x200B001C
 ```
 7. Set ADC_INT_CLR[adc_int_clr] to 1 to clear the interrupt.
 ADC_INT_CLR
 ```
-	# himm 0x200B0014 0x01
-	# devmem 0x200B0014 32 0x01
+  # himm 0x200B0014 0x01
+  # devmem 0x200B0014 32 0x01
 ```
+
