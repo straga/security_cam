@@ -1,0 +1,126 @@
+#!/bin/sh
+service_name="rled"
+
+
+start() {
+    printf 'Starting %s: ' "$service_name"
+    run=true
+    led_state="day"
+    led_val=0
+
+    echo ""
+    #1. working state  
+    #ADC_POWERDOWN - to 0
+    echo "$service_name ADC_POWERDOWN = $(devmem 0x200b0008) set 0"
+    devmem 0x200b0008 32 0
+    echo "$service_name ADC_POWERDOWN set 0 ->" $(devmem 0x200b0008)
+
+    echo ""
+
+    #PERI_CRG32 - sar_adc_cken
+    echo "$service_name PERI_CRG32 - sar_adc_cken = " $(devmem 0x20030080)
+    devmem 0x20030080 32 2
+    echo "$service_name PERI_CRG32 - sar_adc_cken set 2 - >" $(devmem 0x20030080)
+
+    echo ""
+
+    #2. ADC_CTRL -  channel 0
+    echo "$service_name ADC_CTRL -  channe = " $(devmem 0x200B0004)
+    devmem 0x200B0004 32 0
+    echo "$service_name ADC_CTRL -  set channe = 0 ->" $(devmem 0x200B0004)
+
+
+    echo ""
+
+    #3. ADC_INT_MASK adc_int_mask to 1 to disablee the conversion completion interrupt
+    echo "$service_name ADC_INT_MASK adc_int_mask " $(devmem 0x200B0010)
+    devmem 0x200B0010 32 1
+    echo "$service_name ADC_INT_MASK adc_int_mask set 1 ->" $(devmem 0x200B0010)
+
+
+    echo ""
+
+    #4. Set ADC_CTRL[adc_start] to 1 to enable an analog-to-digital conversion.
+    echo "$service_name ADC_CTRL[adc_start] = " 
+    devmem 0x200B0004 32 1
+    echo "$service_name ADC_CTRL -  set adc_start 1 ->" $(devmem 0x200B0004)
+
+
+    echo ""
+    #5. not repeat ADC_STATUS
+    # devmem 0x200B0000
+    echo "$service_name ADC STATUS = " $(devmem 0x200B0000)
+
+
+    # 6. Read ADC_RESULT
+    # # devmem 0x200B001C
+
+    # 7. ADC_INT_CLR to 1 to clear the interrupt
+    # # devmem 0x200B0014 32 1
+    # Repeat 4. 6. and 7.
+
+    led_val=0
+    led_state="day"
+    curl http://localhost/night/off
+
+    # #  curl http://localhost/night/on
+    # #  curl http://localhost/night/off
+
+    # led_val=$(devmem 0x200B001C)
+    # echo "result = $led_val"
+
+    # int compare
+    # -eq # Equal
+    # -ne # Not equal
+    # -lt # Less than
+    # -le # Less than or equal
+    # -gt # Greater than
+    # -ge # Greater than or equal
+
+    (
+    sleep 5
+    while $run
+        do
+            get_state=$led_state
+
+            devmem 0x200B0004 32 1
+            led_val=$(( $(devmem 0x200B001C) ))
+                
+            devmem 0x200B0014 32 1
+
+            # echo $led_val
+
+            if [ $led_val -gt 200 ] 
+            then
+                get_state="night"    
+            else
+                get_state="day"
+            fi
+
+            if [ $led_state != $get_state ]
+            then
+                led_state=$get_state
+                echo "$service_name led_state = $led_state, led_val = $led_val"
+
+                if [ $led_state == "day" ] 
+                then
+                    curl http://localhost/night/off
+                else
+                    curl http://localhost/night/on
+                fi
+            fi
+
+            sleep 3
+        done
+        ) &
+
+ 
+}
+
+case "$1" in
+	start)
+		"$1";;
+	*)
+		echo "Usage: $0 {start}"
+		exit 0
+esac
