@@ -268,28 +268,19 @@ sensors:
 ## Flash over TFTP
 
 ```
-Hi3518ev100 - you can try uboot.
-
-# mw.b 0x82000000 ff 1000000
-# tftp 0x82000000 boot.img
-# sf erase 0x00 0x80000
-# sf write 0x82000000 0x00 ${filesize}
-
 Layout from For Original U-boot
-0x000000000000-0x000000040000 : "boot" 256 0x40000   
-0x000000040000-0x000000080000 : "env"  256 0x40000
+0x000000000000-0x000000040000 : "boot" 256k 0x40000   
+0x000000040000-0x000000080000 : "env"  256k 0x40000
 0x000000080000-0x000000280000 : "kernel" 2048k - 0x200000
 0x000000280000-0x000000780000 : "rootfs" 5120k - 0x500000
 0x000000780000-0x000001000000 : "rootfs_data" 
-
 ```
 
-**Download firmware from OpenIPC github or Telegram Dev.**
+**Download firmware from OpenIPC github or Telegram Dev. for SOC HI3518ev100. Extract that and put it in the TFTP folder.**
 
-Look size boot+env:  bootargs recalculate from your's layout
+Look size boot,env,kernel,rootfs :  bootargs == Take the size from your Original U-boot.
 
 ```
-
 256k(boot),
 256k(env),
 2048k(kernel),
